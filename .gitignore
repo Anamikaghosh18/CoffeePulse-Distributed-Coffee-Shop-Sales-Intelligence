@@ -1,0 +1,90 @@
+# CoffeePulse Git Ignore Rules
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Apache Spark & Hadoop Runtime Artifacts
+metastore_db/
+derby.log
+spark-warehouse/
+.spark-warehouse/
+*.crc
+.tmp*
+
+# Kafka & Streaming Runtime Artifacts
+kafka-logs/
+zookeeper/
+*.kafka
+
+# Datasets (preserve sample data and directory markers only)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# ML Models and Checkpoints (preserve markers only)
+artifacts/models/*
+!artifacts/models/.gitkeep
+artifacts/checkpoints/*
+!artifacts/checkpoints/.gitkeep
+artifacts/metrics/*
+!artifacts/metrics/.gitkeep
+
+# Environment variables & Secrets (never commit actual secrets)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+!*.env.example
+
+# IDE & OS Metadata
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+Desktop.ini
