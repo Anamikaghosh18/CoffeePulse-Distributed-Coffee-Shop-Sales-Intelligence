@@ -1,0 +1,6 @@
+transaction_id,transaction_date,transaction_time,store_id,store_location,product_category,product_detail,unit_price,transaction_qty
+1,2026-01-01,07:05:12,1,Downtown,Coffee,Espresso,3.50,1
+2,2026-01-01,07:12:44,1,Downtown,Bakery,Croissant,4.00,2
+3,2026-01-01,08:00:20,2,Uptown,Coffee,Latte,4.75,1
+4,2026-01-01,08:15:33,1,Downtown,Tea,Earl Grey,3.25,1
+5,2026-01-01,09:30:10,2,Uptown,Coffee,Cappuccino,4.50,2
