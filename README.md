@@ -1,78 +1,79 @@
-# Coffiko: Distributed Coffee Shop Sales Intelligence
+# Coffiko — Coffee Shop Sales Prediction & Analytics
 
-Coffiko is a coffee shop sales intelligence and daily revenue prediction system developed for a Cluster Computing course. The project combines distributed data processing with Apache Spark (PySpark), machine learning via Spark MLlib, a FastAPI backend, and an elevated, professional React dashboard.
-
----
-
-## 1. Project Architecture
-
-```text
-coffeePulse/
-├── data/
-│   ├── raw/                  ← Source Excel (.xlsx) / CSV transactional data (149k rows)
-│   └── processed/            ← PySpark-aggregated daily store sales (Parquet + CSV)
-├── artifacts/
-│   └── metrics/              ← Precomputed Spark SQL analytics & ML evaluation JSONs
-├── spark/
-│   ├── data_processing/etl.py   ← Step 1: PySpark daily aggregation & categorical enrichment
-│   ├── sql_analytics/analytics.py← Step 2: Extended business insights & aggregations
-│   └── ml/pipeline.py           ← Step 3: Spark MLlib feature encoding & regression
-├── backend/                  ← FastAPI REST API serving analytics, metrics & simulator
-└── frontend/                 ← React 19 + Tailwind CSS + Recharts dashboard
-```
+Coffiko is an end-to-end sales intelligence and daily revenue forecasting system built for a **Cluster Computing** course. The platform leverages distributed data processing with **Apache Spark (PySpark)** and machine learning via **Spark MLlib** to analyze real-world coffee shop transactions, examine consumer buying patterns, and predict future daily sales.
 
 ---
 
-## 2. Running the Complete System
+## What the Project Is About
 
-### Step 1: Run PySpark Processing & ML Training (One-time or on data refresh)
-```powershell
-# 1. Run PySpark ETL (aggregates 149k rows into 543 daily store records)
-.\.venv\Scripts\python.exe spark\data_processing\etl.py
+Predicting daily sales is essential for retail coffee shops to optimize inventory, staff allocation, and promotional campaigns. Using a dataset of **149,116 point-of-sale transactions** spanning three New York City branches (Astoria, Hell's Kitchen, and Lower Manhattan) across a 6-month period (January – June 2023), Coffiko answers critical operational questions:
 
-# 2. Compute comprehensive Spark SQL analytics & insights
-.\.venv\Scripts\python.exe spark\sql_analytics\analytics.py
+1. **Revenue Forecasting**: Can daily sales be accurately predicted using weather, promotions, day of the week, and transaction volume?
+2. **Peak Foot-Traffic**: When do retail rush hours occur, and how do customer purchasing patterns vary throughout the day?
+3. **Product Performance**: Which beverages and product categories drive the majority of store revenue?
+4. **Promotion & Environmental Impact**: How significantly do weather conditions and discount campaigns affect daily store performance?
 
-# 3. Train Spark MLlib Linear Regression pipeline & evaluate RMSE
-.\.venv\Scripts\python.exe spark\ml\pipeline.py
-```
+---
 
-### Step 2: Launch Application Servers
+## Machine Learning & Prediction Approach
 
-**Terminal 1 — Backend (FastAPI)**
+The forecasting pipeline is built using **Apache Spark MLlib**:
+
+- **Feature Engineering & Encoding**: Categorical variables (`store_location`, `weather`, `promotion`, `day_of_week`) are transformed into indexed and one-hot encoded sparse vectors using `StringIndexer` and `OneHotEncoder`.
+- **Feature Assembly**: Encoded vectors are concatenated with numerical transaction counts and weekend indicators via `VectorAssembler`.
+- **Model Training**: A `LinearRegression` model is trained on an 80% sample split (460 daily store records) and evaluated against a 20% holdout test set (83 records).
+
+### Model Performance
+
+| Metric | Value | Interpretation |
+| :--- | :--- | :--- |
+| **R² Score** | **0.8589** | Explains **85.9%** of the variance in daily coffee shop sales |
+| **RMSE** | **$149.13** | Average prediction error standard deviation |
+| **MAE** | **$93.83** | Mean absolute daily variance across holdout test records |
+
+---
+
+## Key Insights Discovered
+
+- **Morning Rush Dominance**: Peak customer footfall occurs sharply between **8:00 AM and 10:00 AM** (accounting for over 36,000 orders), with a secondary rush during lunch hours (**12:00 PM – 1:00 PM**).
+- **Core Beverage Share**: **Coffee (38.6%)** and **Tea (28.1%)** collectively account for over **66% of gross revenue** ($466k+), while Bakery items contribute 11.8%.
+- **Top-Selling Items**: *Sustainably Grown Organic Lg* ($21,151) and *Dark Chocolate Lg* ($21,006) are the top revenue-generating individual menu items.
+- **Consistent Business Growth**: Total monthly revenue more than doubled across the first half of the year, expanding from **$81.6k in January to $166.4k in June**.
+- **Location Balance**: Revenue is evenly distributed across branches, led by Hell's Kitchen ($236.5k), Astoria ($232.2k), and Lower Manhattan ($230.1k).
+
+---
+
+## Dashboard Features
+
+The web interface is built as a clean, light-mode product dashboard:
+
+1. **Executive Overview**: High-level KPIs (Total Revenue, Transactions, Avg Ticket, Rush Hours), 6-month revenue growth curve, and hourly foot-traffic distribution.
+2. **Sales Analytics**: Product category share donut chart, top-selling product leaderboard, day-of-week purchasing trends, and weather/promotion comparisons.
+3. **ML Predictions & Actual vs. Predicted Plots**: Time-series overlay of actual versus predicted sales, goodness-of-fit scatter plot with an ideal $x = y$ line, and individual location filters.
+4. **Interactive Revenue Simulator**: A what-if scenario calculator allowing users to select a store, weather condition, promotion, and projected order volume to immediately generate estimated revenue with a 95% confidence interval.
+
+---
+
+## Tech Stack
+
+- **Distributed Data Processing**: Apache Spark (PySpark 4.x), Spark SQL, PyArrow, Parquet
+- **Machine Learning**: Spark MLlib (`LinearRegression`, `VectorAssembler`, `OneHotEncoder`, `RegressionEvaluator`)
+- **Backend API**: Python 3.10+, FastAPI, Uvicorn
+- **Frontend Dashboard**: React 19, JavaScript (JSX), Vite, Tailwind CSS, Recharts
+
+---
+
+## Quickstart
+
+### 1. Run the Backend API
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-- API Documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- Health Check: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
+API Documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-**Terminal 2 — Frontend (React Vite)**
+### 2. Run the Frontend Dashboard
 ```powershell
 cd frontend
 npm run dev
 ```
-- Dashboard: [http://localhost:5173](http://localhost:5173)
-
----
-
-## 3. High-Value Dashboard Insights Included
-
-1. **Overview Dashboard**:
-   - Total Gross Revenue ($698,812), Transactions (149,116), Avg Ticket Size ($4.69), and Peak Rush Hours.
-   - **Monthly Growth Trajectory Area Chart** displaying revenue progression from Jan to Jun 2023.
-   - **Hourly Foot-Traffic Distribution** highlighting the morning commute spike (8 AM - 10 AM) and lunch rush (12 PM - 1 PM).
-   - **Store Location Breakdown** with elevated cards and visual progress bars showing market share across Astoria, Hell's Kitchen, and Lower Manhattan.
-
-2. **Sales Analytics Page**:
-   - **Category Share Donut Chart** showing that Coffee & Tea account for over 66% of gross revenue.
-   - **Top 8 Best-Selling Products Leaderboard** (Units sold, gross revenue, and category tags).
-   - **Day-of-Week Purchasing Patterns** comparing weekday averages against weekend volume.
-   - **Weather Impact Analysis** evaluating foot traffic variations across Sunny, Cloudy, Rainy, and Snowy days.
-   - **Promotional Campaign Performance** measuring the uplift of Weekend Specials, Happy Hours, and BOGO deals.
-
-3. **Machine Learning & Revenue Predictions Page**:
-   - **Spark MLlib Evaluation Metrics**: RMSE ($149.13), R² Score (0.8589), and MAE ($93.83).
-   - **Actual vs. Predicted Revenue Line Chart** with store filtering.
-   - **Residuals & Goodness-of-Fit Scatter Plot** plotted against the ideal $x = y$ line.
-   - **Interactive Revenue Simulator / What-If Scenario Estimator**:
-     Allows professors and users to select Store, Weather, Promotion, and Order Count to instantly estimate predicted revenue with a ±$149.13 RMSE confidence interval.
+Dashboard: [http://localhost:5173](http://localhost:5173)
